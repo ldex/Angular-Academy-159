@@ -1,0 +1,58 @@
+<h2>
+    {{ title }}
+</h2>
+
+<h3>
+    {{ message }}
+</h3>
+
+<ul class="products" *ngIf="products$ | withLoading | async as obs">
+
+    <ng-template [ngIf]="obs.loading">
+        <h2 class="loading">Loading products </h2>
+    </ng-template>
+
+    <ng-template [ngIf]="obs.error">
+        <h2 class="errorMessage">Error: {{ obs.error }}</h2>
+    </ng-template>
+
+    <ng-template [ngIf]="obs.value">
+        <h3>
+            {favourites, plural,
+            =0 {no favourite}
+            =1 {1 favourite}
+            other {{{favourites}} favourites}
+            }
+        </h3>
+
+
+        <div class="right">
+                {{ productsNb }} products | 
+            <a routerLink="insert">New product...</a>
+        </div>
+
+        <div>
+            Sort products:
+            <button (click)="sortList('name')">name</button>
+            <button (click)="sortList('price')">price</button>
+            <button (click)="sortList('modifiedDate')">date</button>
+        </div>
+
+        <li [class.discontinued]="product.discontinued" [class.selected]="selectedProduct===product"
+            *ngFor="let product of obs.value | orderBy: [sorter] | slice:start:end" (click)="onSelect(product)"
+            [title]="product | json">
+            <span class="name">{{ product.name | uppercase }}</span>
+            <span class="description">{{ product.description }}</span>
+            <span class="price">{{ product.price | currency:'CAD':'symbol-narrow':'.2' }}</span>
+        </li>
+
+        <div>
+            <button (click)="previousPage()" [disabled]="start == 0">
+                < Previous Page </button> Page {{ currentPage }} <button (click)="nextPage()"
+                    [disabled]="productsNb <= end">
+                    Next Page >
+            </button>
+        </div>
+    </ng-template>
+
+</ul>
